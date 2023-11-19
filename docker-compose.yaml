@@ -34,6 +34,12 @@ services:
       dockerfile: docker/composer.dockerfile
     volumes:
       - ./panel:/var/www/html
+  site_composer:
+    build:
+      context: .
+      dockerfile: docker/composer.dockerfile
+    volumes:
+      - ./web_site:/var/www/html
   artisan:
     build:
       context: .
