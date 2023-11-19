@@ -41,6 +41,13 @@ services:
     volumes:
       - ./panel:/var/www/html
     entrypoint: ["php" , "/var/www/html/artisan"]
+  web_artisan:
+    build:
+      context: .
+      dockerfile: docker/php_panel.dockerfile
+    volumes:
+      - ./web_site:/var/www/html
+    entrypoint: [ "php" , "/var/www/html/artisan" ]
   mysql:
     image: 'mysql:8.2.0'
     restart: always
