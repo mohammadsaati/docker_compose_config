@@ -1,0 +1,57 @@
+version: "3.8"
+
+services:
+  web_server:
+    image: 'nginx:stable-alpine'
+    ports:
+      - '8000:80'
+    volumes:
+      - ./web_site:/var/www/html
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+  panel_server:
+    image: 'nginx:stable-alpine'
+    ports:
+      - '4000:80'
+    volumes:
+      - ./panel:/var/www/html
+      - ./nginx/nginx_panel.conf:/etc/nginx/conf.d/default.conf:ro
+  web_site:
+    build:
+      context: .
+      dockerfile: docker/php.dockerfile
+    volumes:
+      - ./web_site:/var/www/html:delegated
+  panel:
+    build:
+      context: .
+      dockerfile: docker/php_panel.dockerfile
+    volumes:
+      - ./panel:/var/www/html:delegated
+      - ./panel/storage:/var/www/html/storage
+  site_composer:
+    build:
+      context: .
+      dockerfile: docker/composer.dockerfile
+    volumes:
+      - ./panel:/var/www/html
+  artisan:
+    build:
+      context: .
+      dockerfile: docker/php_panel.dockerfile
+    volumes:
+      - ./panel:/var/www/html
+    entrypoint: ["php" , "/var/www/html/artisan"]
+  mysql:
+    image: 'mysql:8.2.0'
+    restart: always
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    env_file:
+      - ./env/mysql.env
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - '3390:80'
+    environment:
+      - PMA_ARBITRARY=1
